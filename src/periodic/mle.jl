@@ -3,7 +3,8 @@ function update_A!(
     ξ::AbstractArray,
     α::AbstractMatrix,
     β::AbstractMatrix,
-    LL::AbstractMatrix,
+    LL::AbstractMatrix;
+    n2t = CyclicArray(1:size(A, 3), "1D")::AbstractArray{<:Integer}
 )
     @argcheck size(α, 1) == size(β, 1) == size(LL, 1) == size(ξ, 1)
     @argcheck size(α, 2) ==
@@ -16,7 +17,6 @@ function update_A!(
 
     N, K = size(LL)
     T = size(A, 3)
-    n2t = CyclicArray(1:T, "1D")
     @inbounds for n in OneTo(N - 1)
         t = n2t[n] # periodic t
         m = vec_maximum(view(LL, n + 1, :))
@@ -56,14 +56,15 @@ function update_A!(
 end
 
 # # In-place update of the observations distributions.
-function update_B!(B::AbstractMatrix, γ::AbstractMatrix, observations, estimator)
+function update_B!(B::AbstractMatrix, γ::AbstractMatrix, observations, estimator;     
+    n2t = CyclicArray(1:size(B, 2), "1D")::AbstractArray{<:Integer}
+)
     @argcheck size(γ, 1) == size(observations, 1)
     @argcheck size(γ, 2) == size(B, 1)
     N = size(γ, 1)
     K = size(B, 1)
     T = size(B, 2)
     ## For periodicHMM only the n observation corresponding to A(t) are used to update A(t)
-    n2t = CyclicArray(1:T, "1D")
     tₙ = n2t[1:N]
     n_in_t = [findall(tₙ .== t) for t = 1:T] # could probably be speeded up. For exemple computed outside the function only once
 
@@ -80,6 +81,7 @@ end
 function fit_mle!(
     hmm::PeriodicHMM,
     observations;
+    n2t = CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer},
     display=:none,
     maxiter=100,
     tol=1e-3,
@@ -104,8 +106,8 @@ function fit_mle!(
     loglikelihoods!(LL, hmm, observations)
     robust && replace!(LL, -Inf => nextfloat(-Inf), Inf => log(prevfloat(Inf)))
 
-    forwardlog!(α, c, hmm.a, hmm.A, LL)
-    backwardlog!(β, c, hmm.a, hmm.A, LL)
+    forwardlog!(α, c, hmm.a, hmm.A, LL; n2t=n2t)
+    backwardlog!(β, c, hmm.a, hmm.A, LL; n2t=n2t)
     posteriors!(γ, α, β)
 
     logtot = sum(c)
@@ -113,8 +115,8 @@ function fit_mle!(
 
     for it = 1:maxiter
         update_a!(hmm.a, α, β)
-        update_A!(hmm.A, ξ, α, β, LL)
-        update_B!(hmm.B, γ, observations, estimator)
+        update_A!(hmm.A, ξ, α, β, LL; n2t=n2t)
+        update_B!(hmm.B, γ, observations, estimator; n2t=n2t)
 
         # Ensure the "connected-ness" of the states,
         # this prevents case where there is no transitions
@@ -124,11 +126,11 @@ function fit_mle!(
         @check isprobvec(hmm.a)
         @check istransmats(hmm.A)
 
-        loglikelihoods!(LL, hmm, observations)
+        loglikelihoods!(LL, hmm, observations; n2t=n2t)
         robust && replace!(LL, -Inf => nextfloat(-Inf), Inf => log(prevfloat(Inf)))
 
-        forwardlog!(α, c, hmm.a, hmm.A, LL)
-        backwardlog!(β, c, hmm.a, hmm.A, LL)
+        forwardlog!(α, c, hmm.a, hmm.A, LL; n2t=n2t)
+        backwardlog!(β, c, hmm.a, hmm.A, LL; n2t=n2t)
         posteriors!(γ, α, β)
 
         logtotp = sum(c)
