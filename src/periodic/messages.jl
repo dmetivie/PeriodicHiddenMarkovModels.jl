@@ -4,13 +4,13 @@ function forwardlog!(
     c::AbstractVector,
     a::AbstractVector,
     A::AbstractArray{T,3} where {T},
-    LL::AbstractMatrix,
+    LL::AbstractMatrix; 
+    n2t = CyclicArray(1:size(A, 3), "1D")::AbstractArray{<:Integer}
 )
     @argcheck size(α, 1) == size(LL, 1) == size(c, 1)
     @argcheck size(α, 2) == size(LL, 2) == size(a, 1) == size(A, 1) == size(A, 2)
 
     N, K = size(LL)
-    T = size(A, 3)
 
     fill!(α, 0)
     fill!(c, 0)
@@ -28,7 +28,6 @@ function forwardlog!(
 
     c[1] = log(c[1]) + m
 
-    n2t = CyclicArray(1:T, "1D")
     @inbounds for n = 2:N
         tₙ₋₁ = n2t[n-1] # periodic t-1
         m = vec_maximum(view(LL, n, :))
@@ -55,7 +54,8 @@ function backwardlog!(
     c::AbstractVector,
     a::AbstractVector,
     A::AbstractArray{T,3} where {T},
-    LL::AbstractMatrix,
+    LL::AbstractMatrix; 
+    n2t = CyclicArray(1:size(A, 3), "1D")::AbstractArray{<:Integer}
 )
     @argcheck size(β, 1) == size(LL, 1) == size(c, 1)
     @argcheck size(β, 2) == size(LL, 2) == size(a, 1) == size(A, 1) == size(A, 2)
@@ -71,7 +71,6 @@ function backwardlog!(
     for j in OneTo(K)
         β[end, j] = 1
     end
-    n2t = CyclicArray(1:T, "1D")
 
     @inbounds for n = N-1:-1:1
         t = n2t[n] # periodic t
@@ -104,17 +103,17 @@ function backwardlog!(
     c[1] = log(c[1]) + m
 end
 
-function forward(a::AbstractVector, A::AbstractArray{T,3} where {T}, LL::AbstractMatrix)
+function forward(a::AbstractVector, A::AbstractArray{T,3} where {T}, LL::AbstractMatrix; kwargs...)
     m = Matrix{Float64}(undef, size(LL))
     c = Vector{Float64}(undef, size(LL, 1))
-    forwardlog!(m, c, a, A, LL)
+    forwardlog!(m, c, a, A, LL; kwargs...)
     m, sum(c)
 end
 
-function backward(a::AbstractVector, A::AbstractArray{T,3} where {T}, LL::AbstractMatrix)
+function backward(a::AbstractVector, A::AbstractArray{T,3} where {T}, LL::AbstractMatrix; kwargs...)
     m = Matrix{Float64}(undef, size(LL))
     c = Vector{Float64}(undef, size(LL, 1))
-    backwardlog!(m, c, a, A, LL)
+    backwardlog!(m, c, a, A, LL; kwargs...)
     m, sum(c)
 end
 

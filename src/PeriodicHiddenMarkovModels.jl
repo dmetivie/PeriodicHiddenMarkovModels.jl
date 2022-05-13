@@ -31,10 +31,10 @@ export
     # viterbi.jl
     viterbi
 
-include("periodichmm.jl")
-include("mle.jl")
-include("messages.jl")
-include("viterbi.jl")
-include("likelihoods.jl")
+for fname in ["periodichmm.jl", "mle.jl", "messages.jl",
+    "viterbi.jl", "likelihoods.jl"], foldername in ["periodic"]
+    include(joinpath(foldername, fname))
+end
+
 
 end

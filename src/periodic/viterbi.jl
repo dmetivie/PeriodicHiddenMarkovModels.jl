@@ -1,20 +1,19 @@
-
 function viterbi!(
     T1::AbstractMatrix,
     T2::AbstractMatrix,
     z::AbstractVector,
     a::AbstractVector,
     A::AbstractArray{T,3} where {T},
-    L::AbstractMatrix,
+    L::AbstractMatrix;
+    n2t = CyclicArray(1:size(A, 3), "1D")::AbstractArray{<:Integer}
 )
     N, K = size(L)
-    T = size(A, 3)
-    (T == 0) && return
+    (N == 0) && return
 
     fill!(T1, 0)
     fill!(T2, 0)
 
-    c = zero(typeof(T1))
+    c = zero(eltype(T1))
 
     for i in OneTo(K)
         T1[1, i] = a[i] * L[1, i]
@@ -25,10 +24,9 @@ function viterbi!(
         T1[1, i] /= c
     end
 
-    n2t = CyclicArray(1:T, "1D")
     @inbounds for n = 2:N
         tₙ₋₁ = n2t[n-1] # t-1
-        c = zero(typeof(T1))
+        c = zero(eltype(T1))
     
         for j in OneTo(K)
             # TODO: If there is NaNs in T1 this may
@@ -68,11 +66,11 @@ function viterbilog!(
     z::AbstractVector,
     a::AbstractVector,
     A::AbstractArray{T,3} where {T},
-    LL::AbstractMatrix,
+    LL::AbstractMatrix;
+    n2t = CyclicArray(1:size(A, 3), "1D")::AbstractArray{<:Integer}
 )
     N, K = size(LL)
-    T = size(A, 3)
-    (T == 0) && return
+    (N == 0) && return
 
     fill!(T1, 0)
     fill!(T2, 0)
@@ -83,7 +81,7 @@ function viterbilog!(
     for i in OneTo(K)
         T1[1, i] = al[i] + LL[1, i]
     end
-    n2t = CyclicArray(1:T, "1D")
+
     @inbounds for n = 2:N
         tₙ₋₁ = n2t[n-1] # t-1
         for j in OneTo(K)
