@@ -1,5 +1,5 @@
 function likelihoods!(L::AbstractMatrix, hmm::PeriodicHMM{Univariate}, observations; n2t = CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer})
-    N, K, T = size(observations, 1), size(hmm, 1), size(hmm, 3)
+    N, K = size(observations, 1), size(hmm, 1)
     @argcheck size(LL) == (N, K)
     @inbounds for i in OneTo(K), n in OneTo(T)
         t = n2t[n] # periodic t
@@ -8,7 +8,7 @@ function likelihoods!(L::AbstractMatrix, hmm::PeriodicHMM{Univariate}, observati
 end
 
 function likelihoods!(L::AbstractMatrix, hmm::PeriodicHMM{Multivariate}, observations; n2t = CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer})
-    N, K, T = size(observations, 1), size(hmm, 1), size(hmm, 3)
+    N, K = size(observations, 1), size(hmm, 1)
     @argcheck size(LL) == (N, K)
     @inbounds for i in OneTo(K), n in OneTo(T)
         t = n2t[n] # periodic t
@@ -17,7 +17,7 @@ function likelihoods!(L::AbstractMatrix, hmm::PeriodicHMM{Multivariate}, observa
 end
 
 function loglikelihoods!(LL::AbstractMatrix, hmm::PeriodicHMM{Univariate}, observations; n2t = CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer})
-    N, K, T = size(observations, 1), size(hmm, 1), size(hmm, 3)
+    N, K = size(observations, 1), size(hmm, 1)
     @argcheck size(LL) == (N, K)
     @inbounds for i in OneTo(K), n in OneTo(N)
         t = n2t[n] # periodic t
@@ -26,7 +26,7 @@ function loglikelihoods!(LL::AbstractMatrix, hmm::PeriodicHMM{Univariate}, obser
 end
 
 function loglikelihoods!(LL::AbstractMatrix, hmm::PeriodicHMM{Multivariate}, observations; n2t = CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer})
-    N, K, T = size(observations, 1), size(hmm, 1), size(hmm, 3)
+    N, K = size(observations, 1), size(hmm, 1)
     @argcheck size(LL) == (N, K)
     @inbounds for i in OneTo(K), n in OneTo(N)
         t = n2t[n] # periodic t

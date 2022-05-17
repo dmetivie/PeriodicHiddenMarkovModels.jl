@@ -2,6 +2,7 @@ module PeriodicHiddenMarkovModels
 
 using Distributions
 using HMMBase
+using CyclicArrays: CyclicArray
 # Write your package code here.
 
 using Base: OneTo
@@ -9,10 +10,11 @@ using ArgCheck
 using Random: AbstractRNG, GLOBAL_RNG
 
 import Base: ==, copy, rand, size
-import Distributions: fit_mle, loglikelihood
+import Distributions: fit_mle
 
 export
     # periodichmm.jl
+    PeriodicHMM,
     copy,
     rand,
     size,
@@ -22,10 +24,8 @@ export
     backward,
     posteriors,
     # likelihoods.jl
-    likelihood,
-    loglikelihood,
     loglikelihoods,
-    loglikelihoods,
+    likelihoods,
     # mle.jl
     fit_mle,
     # viterbi.jl

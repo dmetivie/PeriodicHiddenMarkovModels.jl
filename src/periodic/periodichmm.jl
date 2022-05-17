@@ -28,21 +28,18 @@ struct PeriodicHMM{F,T} <: AbstractHMM{F}
     a::Vector{T}
     A::Array{T,3}
     B::Matrix{Distribution{F}}
-    PeriodicHMM{F,T}(a, A, B) where {F,T} = assert_periodichmm(a, A, B) && new(a, A, B)
+    PeriodicHMM{F,T}(a, A, B) where {F,T} = assert_hmm(a, A, B) && new(a, A, B)
 end
 
-PeriodicHMM(
-    a::AbstractVector{T},
-    A::AbstractArray{T,3},
-    B::AbstractMatrix{<:Distribution{F}},
-) where {F,T} = PeriodicHMM{F,T}(a, A, B)
+PeriodicHMM(a::AbstractVector{T}, A::AbstractArray{T,3}, B::AbstractMatrix{<:Distribution{F}}) where {F,T} = 
+    PeriodicHMM{F,T}(a, A, B)
 
 PeriodicHMM(A::AbstractArray{T,3}, B::AbstractMatrix{<:Distribution{F}}) where {F,T} =
     PeriodicHMM{F,T}(ones(size(A, 1)) ./ size(A, 1), A, B)
 
 function PeriodicHMM(a::AbstractVector{T}, A::AbstractArray{T,3}, B::AbstractArray{T,3}) where {T}
-    B = map((i, t) -> Categorical(B[i, :, t]), Iterators.product(OneTo(size(B, 1)), OneTo(size(B, 3))))
-    PeriodicHMM{Univariate,T}(a, A, B)
+    ν = map((i, t) -> Categorical(B[i, :, t]), Iterators.product(OneTo(size(B, 1)), OneTo(size(B, 3))))
+    PeriodicHMM{Univariate,T}(a, A, ν)
 end
 
 function assert_hmm(hmm::PeriodicHMM)
@@ -83,10 +80,10 @@ function rand(
     return seq ? (z, y) : y
 end
 
-function rand(rng::AbstractRNG, hmm::PeriodicHMM{Univariate}, z::AbstractVector{<:Integer};
+function rand(rng::AbstractRNG, hmm::PeriodicHMM{Univariate, T}, z::AbstractVector{<:Integer};
         n2t = CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer}
-        )
-    y = Vector{eltype(eltype(hmm.B))}(undef, length(z)) #! Change compare to HHMBase where Vector{Float64} is used
+        ) where T
+    y = Vector{T}(undef, length(z)) #! Change compare to HHMBase where Vector{Float64} is used
     for n in eachindex(z)
         t = n2t[n] # periodic t
         y[n] = rand(rng, hmm.B[z[n], t])
@@ -96,11 +93,11 @@ end
 
 function rand(
     rng::AbstractRNG,
-    hmm::PeriodicHMM{Multivariate},
+    hmm::PeriodicHMM{Multivariate,T},
     z::AbstractVector{<:Integer};
-    n2t = CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer}
-)
-    y = Matrix{eltype(eltype(hmm.B))}(undef, length(z), size(hmm, 2))
+    n2t=CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer}
+) where {T}
+    y = Matrix{T}(undef, length(z), size(hmm, 2))
     for n in eachindex(z)
         t = n2t[n] # periodic t
         y[n, :] = rand(rng, hmm.B[z[n], t])
