@@ -64,7 +64,7 @@ function update_B!(B::AbstractMatrix, γ::AbstractMatrix, observations, estimato
     N = size(γ, 1)
     K = size(B, 1)
     T = size(B, 2)
-    ## For periodicHMM only the n observation corresponding to A(t) are used to update A(t)
+    ## For periodicHMM only the N observations corresponding to A(t) (such that n / tₙ=t) are used to update A(t)
     tₙ = n2t[1:N]
     n_in_t = [findall(tₙ .== t) for t = 1:T] # could probably be speeded up. For exemple computed outside the function only once
 
@@ -103,7 +103,7 @@ function fit_mle!(
     ξ = zeros(N, K, K)
     LL = zeros(N, K)
 
-    loglikelihoods!(LL, hmm, observations)
+    loglikelihoods!(LL, hmm, observations; n2t=n2t)
     robust && replace!(LL, -Inf => nextfloat(-Inf), Inf => log(prevfloat(Inf)))
 
     forwardlog!(α, c, hmm.a, hmm.A, LL; n2t=n2t)
@@ -117,35 +117,35 @@ function fit_mle!(
         update_a!(hmm.a, α, β)
         update_A!(hmm.A, ξ, α, β, LL; n2t=n2t)
         update_B!(hmm.B, γ, observations, estimator; n2t=n2t)
-
+    
         # Ensure the "connected-ness" of the states,
         # this prevents case where there is no transitions
         # between two extremely likely observations.
         robust && (hmm.A .+= eps())
-
+    
         @check isprobvec(hmm.a)
-        @check istransmats(hmm.A)
-
+        @check all(t -> istransmat(hmm.A[:, :, t]), OneTo(T))
+    
         loglikelihoods!(LL, hmm, observations; n2t=n2t)
         robust && replace!(LL, -Inf => nextfloat(-Inf), Inf => log(prevfloat(Inf)))
-
+    
         forwardlog!(α, c, hmm.a, hmm.A, LL; n2t=n2t)
         backwardlog!(β, c, hmm.a, hmm.A, LL; n2t=n2t)
         posteriors!(γ, α, β)
-
+    
         logtotp = sum(c)
         (display == :iter) && println("Iteration $it: logtot = $logtotp")
-
+    
         push!(history.logtots, logtotp)
         history.iterations += 1
-
+    
         if abs(logtotp - logtot) < tol
             (display in [:iter, :final]) &&
                 println("EM converged in $it iterations, logtot = $logtotp")
             history.converged = true
             break
         end
-
+    
         logtot = logtotp
     end
 

@@ -27,7 +27,7 @@ hmm = HMM([0.9 0.1; 0.1 0.9], [0. 0.5 0.5; 0.25 0.25 0.5])
 struct PeriodicHMM{F,T} <: AbstractHMM{F}
     a::Vector{T}
     A::Array{T,3}
-    B::Matrix{Distribution{F}}
+    B::Matrix{<:Distribution{F}}
     PeriodicHMM{F,T}(a, A, B) where {F,T} = assert_hmm(a, A, B) && new(a, A, B)
 end
 
@@ -80,10 +80,10 @@ function rand(
     return seq ? (z, y) : y
 end
 
-function rand(rng::AbstractRNG, hmm::PeriodicHMM{Univariate, T}, z::AbstractVector{<:Integer};
+function rand(rng::AbstractRNG, hmm::PeriodicHMM{Univariate}, z::AbstractVector{<:Integer};
         n2t = CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer}
-        ) where T
-    y = Vector{T}(undef, length(z)) #! Change compare to HHMBase where Vector{Float64} is used
+        )
+    y = Vector{eltype(eltype(hmm.B))}(undef, length(z)) #! Change compare to HHMBase where Vector{Float64} is used
     for n in eachindex(z)
         t = n2t[n] # periodic t
         y[n] = rand(rng, hmm.B[z[n], t])
@@ -93,11 +93,11 @@ end
 
 function rand(
     rng::AbstractRNG,
-    hmm::PeriodicHMM{Multivariate,T},
+    hmm::PeriodicHMM{Multivariate},
     z::AbstractVector{<:Integer};
     n2t=CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer}
-) where {T}
-    y = Matrix{T}(undef, length(z), size(hmm, 2))
+)
+    y = Matrix{eltype(eltype(hmm.B))}(undef, length(z), size(hmm, 2))
     for n in eachindex(z)
         t = n2t[n] # periodic t
         y[n, :] = rand(rng, hmm.B[z[n], t])
