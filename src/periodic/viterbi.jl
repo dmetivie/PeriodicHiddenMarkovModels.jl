@@ -5,7 +5,7 @@ function viterbi!(
     a::AbstractVector,
     A::AbstractArray{T,3} where {T},
     L::AbstractMatrix;
-    n2t = n_to_t(size(L, 1), size(A, 3))::AbstractArray{<:Integer}
+    n2t = n_to_t(size(L, 1), size(A, 3))::AbstractVector{<:Integer}
 )
     N, K = size(L)
     (N == 0) && return
@@ -67,7 +67,7 @@ function viterbilog!(
     a::AbstractVector,
     A::AbstractArray{T,3} where {T},
     LL::AbstractMatrix;
-    n2t = n_to_t(size(LL, 1), size(A, 3))::AbstractArray{<:Integer}
+    n2t = n_to_t(size(LL, 1), size(A, 3))::AbstractVector{<:Integer}
 )
     N, K = size(LL)
     (N == 0) && return

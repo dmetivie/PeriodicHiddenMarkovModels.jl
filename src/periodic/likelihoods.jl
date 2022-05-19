@@ -1,4 +1,4 @@
-function likelihoods!(L::AbstractMatrix, hmm::PeriodicHMM{Univariate}, observations; n2t = n_to_t(size(LL, 1), size(hmm, 3))::AbstractArray{<:Integer})
+function likelihoods!(L::AbstractMatrix, hmm::PeriodicHMM{Univariate}, observations; n2t = n_to_t(size(LL, 1), size(hmm, 3))::AbstractVector{<:Integer})
     N, K = size(observations, 1), size(hmm, 1)
     @argcheck size(LL) == (N, K)
     @inbounds for i in OneTo(K), n in OneTo(T)
@@ -7,7 +7,7 @@ function likelihoods!(L::AbstractMatrix, hmm::PeriodicHMM{Univariate}, observati
     end
 end
 
-function likelihoods!(L::AbstractMatrix, hmm::PeriodicHMM{Multivariate}, observations; n2t = n_to_t(size(LL, 1), size(hmm, 3))::AbstractArray{<:Integer})
+function likelihoods!(L::AbstractMatrix, hmm::PeriodicHMM{Multivariate}, observations; n2t = n_to_t(size(LL, 1), size(hmm, 3))::AbstractVector{<:Integer})
     N, K = size(observations, 1), size(hmm, 1)
     @argcheck size(LL) == (N, K)
     @inbounds for i in OneTo(K), n in OneTo(T)
@@ -16,7 +16,7 @@ function likelihoods!(L::AbstractMatrix, hmm::PeriodicHMM{Multivariate}, observa
     end
 end
 
-function loglikelihoods!(LL::AbstractMatrix, hmm::PeriodicHMM{Univariate}, observations; n2t = n_to_t(size(LL, 1), size(hmm, 3))::AbstractArray{<:Integer})
+function loglikelihoods!(LL::AbstractMatrix, hmm::PeriodicHMM{Univariate}, observations; n2t = n_to_t(size(LL, 1), size(hmm, 3))::AbstractVector{<:Integer})
     N, K = size(observations, 1), size(hmm, 1)
     @argcheck size(LL) == (N, K)
     @inbounds for i in OneTo(K), n in OneTo(N)
@@ -25,7 +25,7 @@ function loglikelihoods!(LL::AbstractMatrix, hmm::PeriodicHMM{Univariate}, obser
     end
 end
 
-function loglikelihoods!(LL::AbstractMatrix, hmm::PeriodicHMM{Multivariate}, observations; n2t = n_to_t(size(LL, 1), size(hmm, 3))::AbstractArray{<:Integer})
+function loglikelihoods!(LL::AbstractMatrix, hmm::PeriodicHMM{Multivariate}, observations; n2t = n_to_t(size(LL, 1), size(hmm, 3))::AbstractVector{<:Integer})
     N, K = size(observations, 1), size(hmm, 1)
     @argcheck size(LL) == (N, K)
     @inbounds for i in OneTo(K), n in OneTo(N)
