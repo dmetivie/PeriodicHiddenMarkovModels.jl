@@ -4,7 +4,7 @@ function update_A!(
     α::AbstractMatrix,
     β::AbstractMatrix,
     LL::AbstractMatrix;
-    n2t = CyclicArray(1:size(A, 3), "1D")::AbstractArray{<:Integer}
+    n2t = n_to_t(size(LL, 1), size(A, 3))::AbstractArray{<:Integer}
 )
     @argcheck size(α, 1) == size(β, 1) == size(LL, 1) == size(ξ, 1)
     @argcheck size(α, 2) ==
@@ -57,7 +57,7 @@ end
 
 # # In-place update of the observations distributions.
 function update_B!(B::AbstractMatrix, γ::AbstractMatrix, observations, estimator;     
-    n2t = CyclicArray(1:size(B, 2), "1D")::AbstractArray{<:Integer}
+    n2t = n_to_t(size(γ, 1), size(B, 2))::AbstractArray{<:Integer}
 )
     @argcheck size(γ, 1) == size(observations, 1)
     @argcheck size(γ, 2) == size(B, 1)
@@ -81,7 +81,7 @@ end
 function fit_mle!(
     hmm::PeriodicHMM,
     observations;
-    n2t = CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer},
+    n2t = n_to_t(size(observations, 1), size(hmm, 3))::AbstractArray{<:Integer},
     display=:none,
     maxiter=100,
     tol=1e-3,

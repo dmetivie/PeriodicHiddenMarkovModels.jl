@@ -66,7 +66,7 @@ function rand(
     rng::AbstractRNG,
     hmm::PeriodicHMM,
     N::Integer;
-    n2t = CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer}, # #? There probably is a simple way to do that without the CyclicArray dependency
+    n2t = n_to_t(N, size(hmm, 3))::AbstractArray{<:Integer}, 
     init=rand(rng, Categorical(hmm.a)),
     seq=false
 )
@@ -76,12 +76,12 @@ function rand(
         tₙ₋₁ = n2t[n-1] # periodic t-1
         z[n] = rand(rng, Categorical(hmm.A[z[n-1], :, tₙ₋₁]))
     end
-    y = rand(rng, hmm, z)
+    y = rand(rng, hmm, z; n2t=n2t)
     return seq ? (z, y) : y
 end
 
 function rand(rng::AbstractRNG, hmm::PeriodicHMM{Univariate}, z::AbstractVector{<:Integer};
-        n2t = CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer}
+        n2t = n_to_t(size(z, 1), size(hmm, 3))::AbstractArray{<:Integer}
         )
     y = Vector{eltype(eltype(hmm.B))}(undef, length(z)) #! Change compare to HHMBase where Vector{Float64} is used
     for n in eachindex(z)
@@ -95,7 +95,7 @@ function rand(
     rng::AbstractRNG,
     hmm::PeriodicHMM{Multivariate},
     z::AbstractVector{<:Integer};
-    n2t=CyclicArray(1:size(hmm, 3), "1D")::AbstractArray{<:Integer}
+    n2t=n_to_t(size(z, 1), size(hmm, 3))::AbstractArray{<:Integer}
 )
     y = Matrix{eltype(eltype(hmm.B))}(undef, length(z), size(hmm, 2))
     for n in eachindex(z)

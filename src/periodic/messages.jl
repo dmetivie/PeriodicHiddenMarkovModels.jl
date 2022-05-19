@@ -5,7 +5,7 @@ function forwardlog!(
     a::AbstractVector,
     A::AbstractArray{T,3} where {T},
     LL::AbstractMatrix; 
-    n2t = CyclicArray(1:size(A, 3), "1D")::AbstractArray{<:Integer}
+    n2t = n_to_t(size(LL, 1), size(A, 3))::AbstractArray{<:Integer}
 )
     @argcheck size(α, 1) == size(LL, 1) == size(c, 1)
     @argcheck size(α, 2) == size(LL, 2) == size(a, 1) == size(A, 1) == size(A, 2)
@@ -55,7 +55,7 @@ function backwardlog!(
     a::AbstractVector,
     A::AbstractArray{T,3} where {T},
     LL::AbstractMatrix; 
-    n2t = CyclicArray(1:size(A, 3), "1D")::AbstractArray{<:Integer}
+    n2t = n_to_t(size(LL, 1), size(A, 3))::AbstractArray{<:Integer}
 )
     @argcheck size(β, 1) == size(LL, 1) == size(c, 1)
     @argcheck size(β, 2) == size(LL, 2) == size(a, 1) == size(A, 1) == size(A, 2)

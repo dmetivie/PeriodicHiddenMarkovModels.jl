@@ -2,7 +2,6 @@ module PeriodicHiddenMarkovModels
 
 using Distributions
 using HMMBase
-using CyclicArrays: CyclicArray
 using HMMBase: posteriors!, vec_maximum, EMHistory, update_a!, isprobvec # function not exported by default by HHMBase
 
 using Base: OneTo
@@ -30,6 +29,8 @@ export
     fit_mle,
     # viterbi.jl
     viterbi
+
+include("utilities.jl")
 
 for fname in ["periodichmm.jl", "mle.jl", "messages.jl",
         "viterbi.jl", "likelihoods.jl"], foldername in ["periodic"]
