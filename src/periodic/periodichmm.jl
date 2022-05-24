@@ -24,14 +24,16 @@ hmm = HMM([0.9 0.1; 0.1 0.9], [Normal(0,1), Normal(10,1)])
 hmm = HMM([0.9 0.1; 0.1 0.9], [0. 0.5 0.5; 0.25 0.25 0.5])
 ```
 """
-struct PeriodicHMM{F,T} <: AbstractHMM{F}
+abstract type AbstractPeriodicHMM{F<:VariateForm} <: AbstractHMM{F} end
+
+struct PeriodicHMM{F,T} <: AbstractPeriodicHMM{F}
     a::Vector{T}
     A::Array{T,3}
     B::Matrix{<:Distribution{F}}
     PeriodicHMM{F,T}(a, A, B) where {F,T} = assert_hmm(a, A, B) && new(a, A, B)
 end
 
-PeriodicHMM(a::AbstractVector{T}, A::AbstractArray{T,3}, B::AbstractMatrix{<:Distribution{F}}) where {F,T} = 
+PeriodicHMM(a::AbstractVector{T}, A::AbstractArray{T,3}, B::AbstractMatrix{<:Distribution{F}}) where {F,T} =
     PeriodicHMM{F,T}(a, A, B)
 
 PeriodicHMM(A::AbstractArray{T,3}, B::AbstractMatrix{<:Distribution{F}}) where {F,T} =
@@ -63,7 +65,7 @@ end
 
 function rand(
     rng::AbstractRNG,
-    hmm::PeriodicHMM,
+    hmm::AbstractPeriodicHMM,
     N::Integer;
     init=rand(rng, Categorical(hmm.a)),
     seq=false
@@ -81,10 +83,11 @@ end
 
 function rand(
     rng::AbstractRNG,
-    hmm::PeriodicHMM,
+    hmm::AbstractPeriodicHMM,
     n2t::AbstractVector{<:Integer};
     init=rand(rng, Categorical(hmm.a)),
-    seq=false
+    seq=false,
+    kwargs...
 )
     N = length(n2t)
     z = Vector{Int}(undef, N)
@@ -93,13 +96,13 @@ function rand(
         tₙ₋₁ = n2t[n-1] # periodic t-1
         z[n] = rand(rng, Categorical(hmm.A[z[n-1], :, tₙ₋₁]))
     end
-    y = rand(rng, hmm, z; n2t=n2t)
+    y = rand(rng, hmm, z; n2t=n2t, kwargs...)
     return seq ? (z, y) : y
 end
 
 function rand(rng::AbstractRNG, hmm::PeriodicHMM{Univariate}, z::AbstractVector{<:Integer};
-        n2t = n_to_t(size(z, 1), size(hmm, 3))::AbstractVector{<:Integer}
-        )
+    n2t=n_to_t(size(z, 1), size(hmm, 3))::AbstractVector{<:Integer}
+)
     y = Vector{eltype(eltype(hmm.B))}(undef, length(z)) #! Change compare to HHMBase where Vector{Float64} is used
     for n in eachindex(z)
         t = n2t[n] # periodic t

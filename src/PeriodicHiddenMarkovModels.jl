@@ -31,11 +31,11 @@ export
     viterbi
 
 include("utilities.jl")
-
-for fname in ["periodichmm.jl", "mle.jl", "messages.jl",
-        "viterbi.jl", "likelihoods.jl"], foldername in ["periodic"]
+for fname in ["periodichmm.jl", "mle.jl", "likelihoods.jl"], foldername in ["periodic"]
     include(joinpath(foldername, fname))
 end
+include("messages.jl")
+include("viterbi.jl")
 
 
 end
