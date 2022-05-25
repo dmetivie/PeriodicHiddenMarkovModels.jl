@@ -13,6 +13,7 @@ import HMMBase: fit_mle!
 
 export
     # periodichmm.jl
+    AbstractPeriodicHMM,
     PeriodicHMM,
     copy,
     rand,
@@ -22,13 +23,8 @@ export
     forward,
     backward,
     posteriors,
-    # likelihoods.jl
-    loglikelihoods,
-    likelihoods,
     # mle.jl
-    fit_mle,
-    # viterbi.jl
-    viterbi
+    fit_mle
 
 include("utilities.jl")
 for fname in ["periodichmm.jl", "mle.jl", "likelihoods.jl"], foldername in ["periodic"]
