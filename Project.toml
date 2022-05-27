@@ -10,6 +10,7 @@ HMMBase = "b2b3ca75-8444-5ffa-85e6-af70e2b64fe7"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
+Distributions = "0.25"
 ArgCheck = "2"
 julia = "1"
 
