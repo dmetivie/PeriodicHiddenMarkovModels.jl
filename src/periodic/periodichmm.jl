@@ -85,18 +85,18 @@ function rand(
     rng::AbstractRNG,
     hmm::AbstractPeriodicHMM,
     n2t::AbstractVector{<:Integer};
-    init=rand(rng, Categorical(hmm.a)),
+    z_ini=rand(rng, Categorical(hmm.a))::Integer,
     seq=false,
     kwargs...
 )
     N = length(n2t)
-    z = Vector{Int}(undef, N)
-    (N >= 1) && (z[1] = init)
+    z = zeros(Int, N)
+    (N >= 1) && (z[1] = z_ini)
     for n = 2:N
         tₙ₋₁ = n2t[n-1] # periodic t-1
         z[n] = rand(rng, Categorical(hmm.A[z[n-1], :, tₙ₋₁]))
     end
-    y = rand(rng, hmm, z; n2t=n2t, kwargs...)
+    y = rand(rng, hmm, z, n2t; kwargs...)
     return seq ? (z, y) : y
 end
 

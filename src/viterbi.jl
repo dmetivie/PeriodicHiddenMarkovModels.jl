@@ -106,3 +106,12 @@ function viterbilog!(
         z[n] = T2[n+1, z[n+1]]
     end
 end
+
+function viterbi(a::AbstractVector, A::AbstractArray, LL::AbstractMatrix; n2t = n_to_t(size(LL, 1), size(A, 3))::AbstractVector{<:Integer})
+    ## --------------------
+    T1 = Matrix{Float64}(undef, size(LL))
+    T2 = Matrix{Int}(undef, size(LL))
+    z = Vector{Int}(undef, size(LL, 1))
+    viterbilog!(T1, T2, z, a, A, LL; n2t=n2t)
+    return z
+end

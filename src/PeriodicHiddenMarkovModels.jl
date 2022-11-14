@@ -8,8 +8,10 @@ using Base: OneTo
 using ArgCheck
 using Random: AbstractRNG, GLOBAL_RNG
 
-import Base: ==, copy, rand, size
-import HMMBase: fit_mle!
+import Base: ==, copy, size
+import HMMBase: rand, fit_mle!, viterbi, viterbi!, viterbilog!
+#? should I import rand from Base or HMMBase? (I will be elaborating on the rand method devlopped in HHMBase)
+import Distributions: fit_mle
 
 export
     # periodichmm.jl
@@ -24,7 +26,10 @@ export
     backward,
     posteriors,
     # mle.jl
-    fit_mle
+    fit_mle,
+    viterbi,
+    # utilities.jl
+    n_to_t
 
 include("utilities.jl")
 for fname in ["periodichmm.jl", "mle.jl", "likelihoods.jl"], foldername in ["periodic"]
