@@ -63,23 +63,7 @@ function assert_hmm(a::AbstractVector, A::AbstractArray{T,3} where {T}, B::Abstr
     return true
 end
 
-function rand(
-    rng::AbstractRNG,
-    hmm::AbstractPeriodicHMM,
-    N::Integer;
-    init=rand(rng, Categorical(hmm.a)),
-    seq=false
-)
-    n2t = n_to_t(N, size(hmm, 3))
-    z = Vector{Int}(undef, N)
-    (N >= 1) && (z[1] = init)
-    for n = 2:N
-        tₙ₋₁ = n2t[n-1] # periodic t-1
-        z[n] = rand(rng, Categorical(hmm.A[z[n-1], :, tₙ₋₁]))
-    end
-    y = rand(rng, hmm, z; n2t=n2t)
-    return seq ? (z, y) : y
-end
+rand(rng::AbstractRNG, hmm::AbstractPeriodicHMM, N::Integer; kwargs...) = rand(rng, hmm, n_to_t(N, size(hmm, 3)); kwargs...)    
 
 function rand(
     rng::AbstractRNG,
@@ -100,8 +84,10 @@ function rand(
     return seq ? (z, y) : y
 end
 
-function rand(rng::AbstractRNG, hmm::PeriodicHMM{Univariate}, z::AbstractVector{<:Integer};
-    n2t=n_to_t(size(z, 1), size(hmm, 3))::AbstractVector{<:Integer}
+function rand(rng::AbstractRNG, 
+    hmm::PeriodicHMM{Univariate}, 
+    z::AbstractVector{<:Integer}, 
+    n2t::AbstractVector{<:Integer}
 )
     y = Vector{eltype(eltype(hmm.B))}(undef, length(z)) #! Change compare to HHMBase where Vector{Float64} is used
     for n in eachindex(z)
@@ -115,7 +101,7 @@ function rand(
     rng::AbstractRNG,
     hmm::PeriodicHMM{Multivariate},
     z::AbstractVector{<:Integer};
-    n2t=n_to_t(size(z, 1), size(hmm, 3))::AbstractVector{<:Integer}
+    n2t::AbstractVector{<:Integer}
 )
     y = Matrix{eltype(eltype(hmm.B))}(undef, length(z), size(hmm, 2))
     for n in eachindex(z)

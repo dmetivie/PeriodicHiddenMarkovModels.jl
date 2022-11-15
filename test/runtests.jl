@@ -34,7 +34,7 @@ Q_guess[2, 1, :] = [0.55 for t in 1:T]
 @testset "Basic functions" begin
     hmm = PeriodicHMM(Q, ν)
 
-    global z, y = rand(hmm, N, seq=true)
+    global z, y = rand(hmm, N, seq=true, z_ini = K)
 
     hmm_guess0 = PeriodicHMM(Q_guess, ν_guess)
     global hmm_fit, hist = fit_mle(hmm_guess0, y, display=:none, robust=true, maxiter=1000)
