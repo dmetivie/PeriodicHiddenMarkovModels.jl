@@ -9,7 +9,7 @@ using ArgCheck
 using Random: AbstractRNG, GLOBAL_RNG
 
 import Base: ==, copy, size
-import HMMBase: rand, fit_mle!, viterbi, viterbi!, viterbilog!
+import HMMBase: rand, fit_mle!, viterbi, viterbilog! # viterbi! is not in HHMBase (anymore?)
 #? should I import rand from Base or HMMBase? (I will be elaborating on the rand method devlopped in HHMBase)
 import Distributions: fit_mle
 
