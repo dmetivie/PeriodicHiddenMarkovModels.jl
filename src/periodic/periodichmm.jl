@@ -63,6 +63,8 @@ function assert_hmm(a::AbstractVector, A::AbstractArray{T,3} where {T}, B::Abstr
     return true
 end
 
+rand(hmm::AbstractHMM, n2t::AbstractVector{<:Integer}; kwargs...) = rand(GLOBAL_RNG, hmm, n2t; kwargs...)
+
 rand(rng::AbstractRNG, hmm::AbstractPeriodicHMM, N::Integer; kwargs...) = rand(rng, hmm, n_to_t(N, size(hmm, 3)); kwargs...)    
 
 function rand(
