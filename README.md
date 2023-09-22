@@ -3,6 +3,10 @@
 This package is an extension of the package [HMMBase.jl](https://github.com/maxmouchet/HMMBase.jl) that originally define, use, fit Hidden Markov Models.
 The extension adds the subtype `PeriodicHMM` to the type `HMMBase.AbstractHMM` that deals with non-constant transition matrix `A(t)` and emission distribution `B(t)`.
 
+WARNING: As it is `fit_mle` does not enforce smoothness of hidden states with `t` i.e. because HMM are identifiable up to a relabeling nothing prevents that after fitting `ν[k=1, t=1]` and `ν[k=1, t=2]` mean the same hidden state (same for `Q` matrix).
+To enforce smoothness and identifiability (up to a global index relabeling), one can be inspired by seasonal Hidden Markov Model, see [A. Touron (2019)](https://link.springer.com/article/10.1007/s11222-019-09854-4).
+I implement that idea and generalization to other statistic model like HMM, Mixture, Auto Regressive in [SmoothPeriodicStatsModels.jl](https://github.com/dmetivie/SmoothPeriodicStatsModels.jl).
+
 ## Simple example
 
 ```julia
@@ -80,6 +84,7 @@ end
 plot(p..., size=(1000, 500))
 ```
 ![Time dependent transition matrix coefficient](img/Q_estiamated.svg)
+
 #### Emission distribution
 
 ```julia
@@ -92,4 +97,5 @@ for i in 1:K
 end
 plot(p..., size=(1000, 500))
 ```
+
 ![Emission distribution parameters](img/nu_estiamated.svg)
