@@ -24,7 +24,7 @@ hmm = HMM([0.9 0.1; 0.1 0.9], [Normal(0,1), Normal(10,1)])
 hmm = HMM([0.9 0.1; 0.1 0.9], [0. 0.5 0.5; 0.25 0.25 0.5])
 ```
 """
-abstract type AbstractPeriodicHMM{F<:VariateForm} <: AbstractHMM{F} end
+abstract type AbstractPeriodicHMM{F<:VariateForm} end
 
 struct PeriodicHMM{F,T} <: AbstractPeriodicHMM{F}
     a::Vector{T}
@@ -63,7 +63,7 @@ function assert_hmm(a::AbstractVector, A::AbstractArray{T,3} where {T}, B::Abstr
     return true
 end
 
-rand(hmm::AbstractPeriodicHMM, n2t::AbstractVector{<:Integer}; kwargs...) = rand(GLOBAL_RNG, hmm, n2t; kwargs...)
+rand(hmm::AbstractPeriodicHMM, N::Integer; kwargs...) = rand(GLOBAL_RNG, hmm, N; kwargs...)
 
 rand(rng::AbstractRNG, hmm::AbstractPeriodicHMM, N::Integer; kwargs...) = rand(rng, hmm, n_to_t(N, size(hmm, 3)); kwargs...)    
 
@@ -131,7 +131,7 @@ Permute the states of `hmm` according to `perm`.
 - `perm::Vector{<:Integer}`: permutation of the states.
 
 """
-function permute(hmm::AbstractHMM, perm::Vector{<:Integer})
+function permute(hmm::AbstractPeriodicHMM, perm::Vector{<:Integer})
     @argcheck length(perm) == length(hmm.a) == size(hmm.A, 1) == size(hmm.B, 1)
     a = hmm.a[perm]
     B = copy(hmm.B)

@@ -1,17 +1,17 @@
 module PeriodicHiddenMarkovModels
 
 using Distributions
-using HMMBase
-using HMMBase: posteriors!, vec_maximum, EMHistory, update_a!, isprobvec # function not exported by default by HHMBase
+# using HMMBase
+# using HMMBase: posteriors!, vec_maximum, EMHistory, update_a!, isprobvec # function not exported by default by HHMBase
 
 using Base: OneTo
 using ArgCheck
 using Random: AbstractRNG, GLOBAL_RNG
 
 import Base: ==, copy, size
-import HMMBase: rand, fit_mle!, viterbi, viterbilog! # viterbi! is not in HHMBase (anymore?)
+# import HMMBase: rand, fit_mle!, viterbi, viterbilog! # viterbi! is not in HHMBase (anymore?)
 #? should I import rand from Base or HMMBase? (I will be elaborating on the rand method devlopped in HHMBase)
-import Distributions: fit_mle
+import Distributions: fit_mle, rand
 
 export
     # periodichmm.jl

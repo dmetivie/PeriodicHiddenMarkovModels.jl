@@ -93,7 +93,7 @@ function fit_mle!(
 
     N, K, T = size(observations, 1), size(hmm, 1), size(hmm, 3)
     @argcheck T == size(hmm.B, 2)
-    history = EMHistory(false, 0, [])
+    history = Dict("converged" => false, "iterations" => 0, "logtots" => Float64[])
 
     # Allocate memory for in-place updates
     c = zeros(N)
@@ -136,24 +136,31 @@ function fit_mle!(
         logtotp = sum(c)
         (display == :iter) && println("Iteration $it: logtot = $logtotp")
     
-        push!(history.logtots, logtotp)
-        history.iterations += 1
+        push!(history["logtots"], logtotp)
+        history["iterations"] += 1
     
         if abs(logtotp - logtot) < tol
             (display in [:iter, :final]) &&
                 println("EM converged in $it iterations, logtot = $logtotp")
-            history.converged = true
+            history["converged"] = true
             break
         end
     
         logtot = logtotp
     end
 
-    if !history.converged
+    if !history["converged"]
         if display in [:iter, :final]
-            println("EM has not converged after $(history.iterations) iterations, logtot = $logtot")
+            println("EM has not converged after $(history["iterations"]) iterations, logtot = $logtot")
         end
     end
 
     history
+end
+
+function fit_mle(hmm::PeriodicHMM, args...; kwargs...)
+    hmm = copy(hmm)
+
+    history = fit_mle!(hmm, args...; kwargs...)
+    hmm, history
 end
