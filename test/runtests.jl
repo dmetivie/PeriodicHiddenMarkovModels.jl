@@ -2,6 +2,7 @@ using PeriodicHiddenMarkovModels
 using Test
 using HiddenMarkovModels, Distributions
 using Random
+using StableRNGs
 
 
 @testset "Comparing with HiddenMarkovModels.jl in trivial case T = 1 (homogeneous)" begin
@@ -137,10 +138,11 @@ end
 # end
 
 @testset "HiddentMarlovModel Tuto time" begin
-
+    rng = StableRNG(63);
     init = [0.6, 0.4]
     trans_per = ([0.7 0.3; 0.2 0.8], [0.3 0.7; 0.8 0.2])
     dists_per = ([Normal(-1.0), Normal(-2.0)], [Normal(+1.0), Normal(+2.0)])
+    T = length(trans_per)
     hmm = PeriodicHMM(init, trans_per, dists_per)
 
     control_seq = repeat(1:2, 5)
@@ -166,12 +168,12 @@ end
     hmm_est, loglikelihood_evolution = baum_welch(hmm_guess, obs_seq, control_seq; seq_ends)
     first(loglikelihood_evolution), last(loglikelihood_evolution)
 
-    cat(transition_matrix(hmm_est, 1), transition_matrix(hmm, 1); dims=3)
-
-    cat(transition_matrix(hmm_est, 2), transition_matrix(hmm, 2); dims=3)
+    for t in 1:T
+        @test transition_matrix(hmm_est, t) ≈ transition_matrix(hmm, t) rtol = 15e-2
+    end
 
     map(mean, hcat(obs_distributions(hmm_est, 1), obs_distributions(hmm, 1)))
 
     map(mean, hcat(obs_distributions(hmm_est, 2), obs_distributions(hmm, 2)))
-    #TODO: add actual test
+    #TODO: complete the test
 end
