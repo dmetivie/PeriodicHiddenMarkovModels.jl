@@ -15,8 +15,10 @@ function StatsAPI.fit!(
     for k in eachindex(seq_ends)
         t1, t2 = HMMs.seq_limits(seq_ends, k)
         hmm.init .+= γ[:, t1]
+        n2t_k = view(n2t, t1:t2)
+
         for l in 1:L
-            hmm.trans[l] .+= sum(ξ[(t1 + l - 1):L:t2])
+            hmm.trans[l] .+= sum(ξ[first(parentindices(n2t_k))[findall(n2t_k .== l)]])
         end
     end
     hmm.init ./= sum(hmm.init)
