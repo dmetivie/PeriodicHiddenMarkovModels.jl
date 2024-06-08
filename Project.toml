@@ -6,11 +6,13 @@ version = "0.2.0"
 [deps]
 ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
 HiddenMarkovModels = "84ca31d5-effc-45e0-bfda-5a68cd981f47"
-StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
 StatsAPI = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
 
 [compat]
 julia = "1"
+ArgCheck = "2.3"
+StatsAPI = "1.6"
+HiddenMarkovModels = "0.5"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
