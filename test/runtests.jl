@@ -177,3 +177,5 @@ end
     map(mean, hcat(obs_distributions(hmm_est, 2), obs_distributions(hmm, 2)))
     #TODO: complete the test
 end
+
+#TODO: add multi sequences test
