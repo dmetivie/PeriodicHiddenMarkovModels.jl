@@ -29,7 +29,8 @@ export
     fit_mle,
     viterbi,
     # utilities.jl
-    n_to_t
+    n_to_t,
+    randPeriodicHMM
 
 include("utilities.jl")
 for fname in ["periodichmm.jl", "mle.jl", "likelihoods.jl"], foldername in ["periodic"]
