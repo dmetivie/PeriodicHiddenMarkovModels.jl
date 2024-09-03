@@ -17,11 +17,9 @@ Alternatively, `B(t)` can be an emission matrix where `B[i,j,t]` is the probabil
 
 **Example**
 ```julia
-using Distributions, PeriodicHMM
+using Distributions, PeriodicHiddenMarkovModels
 # from distributions
-hmm = HMM([0.9 0.1; 0.1 0.9], [Normal(0,1), Normal(10,1)])
-# from an emission matrix
-hmm = HMM([0.9 0.1; 0.1 0.9], [0. 0.5 0.5; 0.25 0.25 0.5])
+# hmm = PeriodicHMM([0.9 0.1; 0.1 0.9], [Normal(0,1) Normal(10,1); Normal(-10,1), Normal(10,2)])
 ```
 """
 abstract type AbstractPeriodicHMM{F<:VariateForm} end
@@ -85,6 +83,8 @@ function rand(
     y = rand(rng, hmm, z, n2t; kwargs...)
     return seq ? (z, y) : y
 end
+
+rand(hmm::AbstractPeriodicHMM, n2t::AbstractVector{<:Integer}; kwargs...) = rand(GLOBAL_RNG, hmm, n2t; kwargs...)
 
 function rand(rng::AbstractRNG, 
     hmm::PeriodicHMM{Univariate}, 

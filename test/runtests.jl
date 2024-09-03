@@ -55,6 +55,22 @@ Random.seed!(2022)
     @test all(isapprox.(Distributions.params.(hmm_fit.B[:, 1]) .|> collect, Distributions.params.(hmm_base_fit.dists) .|> collect, rtol=1e-2))
 end
 
+@testset "Generation" begin
+    Random.seed!(2020)
+    K = 3 # Number of Hidden states
+    T = 11 # Period
+    N = 49_586 # Length of observation
+    D = 6 # dimension of observed variables
+    z_ini = 1
+    n2t = n_to_t(N,T)
+    n2t[8] = 1
+    n2t[9] = 1
+    
+    hmm_random = randPeriodicHMM(K, T, D)
+
+    z, y = rand(hmm_random, n2t; z_ini=z_ini, seq=true)
+end
+
 @testset "Periodic example" begin
     K = 2
     T = 10
