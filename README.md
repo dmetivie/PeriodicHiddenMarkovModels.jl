@@ -1,10 +1,11 @@
 # PeriodicHiddenMarkovModels
 
 This package was built as an extension of the package [HMMBase.jl](https://github.com/maxmouchet/HMMBase.jl) (no longer maintained) that originally define, use, fit Hidden Markov Models.
-The extension adds the subtype `PeriodicHMM` to the type `HMMBase.AbstractHMM` that deals with non-constant transition matrix `A(t)` and emission distribution `B(t)`.
+The extension adds the type `PeriodicAbstractHMM` that deals with non-constant transition matrix `A(t)` and emission distribution `B(t)`.
 
 > [!NOTE]
->In some future the extension should change gear to depend on the package [HiddenMarkovModels.jl](https://github.com/gdalle/HiddenMarkovModels.jl) instead of the deprecated [HMMBase.jl](https://github.com/maxmouchet/HMMBase.jl).
+> This version 0.3.0 (and 0.1.3 that did not got registered) has no external dependance toward [HiddenMarkovModels.jl](https://github.com/gdalle/HiddenMarkovModels.jl) or [HMMBase.jl](https://github.com/maxmouchet/HMMBase.jl). It just copy paste some needed [HMMBase.jl](https://github.com/maxmouchet/HMMBase.jl) code. This version is useful (for me while I figure some stuff).
+>In some future the extension should only depends on the package [HiddenMarkovModels.jl](https://github.com/gdalle/HiddenMarkovModels.jl). It should also contain "smooth periodic HMM" i.e. where parameters of the inhomogeneous chain vary smoothly.
 
 > [!WARNING]
 > As it is `fit_mle` does not enforce smoothness of hidden states with `t` i.e. because HMM are identifiable up to a relabeling nothing prevents that after fitting `ν[k=1, t=1]` and `ν[k=1, t=2]` mean the same hidden state (same for `Q` matrix).
