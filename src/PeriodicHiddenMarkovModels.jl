@@ -4,6 +4,7 @@ using ArgCheck: @argcheck
 import HiddenMarkovModels as HMMs
 import StatsAPI
 using HiddenMarkovModels
+using HiddenMarkovModels: AbstractVectorOrNTuple
 
 export
     # utilities.jl
