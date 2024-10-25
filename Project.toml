@@ -1,7 +1,7 @@
 name = "PeriodicHiddenMarkovModels"
 uuid = "4873b48c-7fd1-4fb6-93c5-649b25bdde2e"
 authors = ["David Métivier <david.metivier@inrae.fr> and contributors"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
@@ -9,7 +9,7 @@ HiddenMarkovModels = "84ca31d5-effc-45e0-bfda-5a68cd981f47"
 StatsAPI = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
 
 [compat]
-julia = "1.10"
+julia = "1.10, 1.11"
 ArgCheck = "2.3"
 StatsAPI = "1.6"
 HiddenMarkovModels = "0.6"
