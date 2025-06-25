@@ -26,7 +26,6 @@ export
     backward,
     posteriors,
     # mle.jl
-    fit_mle,
     viterbi,
     # utilities.jl
     n_to_t,
