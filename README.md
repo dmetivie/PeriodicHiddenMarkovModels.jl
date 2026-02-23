@@ -3,9 +3,16 @@
 This package is an extension of the package [HiddenMarkovModels.jl](https://github.com/gdalle/HiddenMarkovModels.jl) that defines a lot of the Hidden Markov Models tools (Baum Welch, Viterbi, etc.).
 The extension adds the subtype `PeriodicHMM` to the type `HiddenMarkovModels.AbstractHMM` that deals with non-constant transition matrix `A(t)` and emission distribution `B(t)`.
 
-Before v0.2 this package depended on the no longer maintained [HMMBase.jl](https://github.com/maxmouchet/HMMBase.jl). It is now inspired by this [Tutorial](https://gdalle.github.io/HiddenMarkovModels.jl/dev/examples/temporal/) of the [HiddenMarkovModels.jl](https://github.com/gdalle/HiddenMarkovModels.jl) model, meaning that it should benefit from all the good stuff there. In particular mutli-sequence support.
-The major notable difference is that `PeriodicHMM` here do not have to be periodic, they can be completely time inhomogeneous.
-This is controlled by the `n2t` vector which indicates the correspondance between observation `n` and the associated element of the HMM `t`. See example bellow.
+> [!NOTE]
+> Note that `PeriodicHMM` models here do not have to be periodic; they can be completely time-inhomogeneous.
+> This is controlled by the `n2t` vector which indicates the correspondence between observation `n` and the associated element of the HMM `t`, see the example below.
+
+Before `v0.1.4`, this package depended on the no longer maintained [HMMBase.jl](https://github.com/maxmouchet/HMMBase.jl).
+After `v0.2`, it now depends on the [HiddenMarkovModels.jl](https://github.com/gdalle/HiddenMarkovModels.jl) package.
+For `v0.1.4` and `v0.1.5`, it has no dependencies (reimplementing `HMMBase.jl` functions), just for compatibility with other package I am developing (but this is not the long term plan).
+
+The code for $\geq$`v0.2`, is inspired by this [Tutorial](https://gdalle.github.io/HiddenMarkovModels.jl/dev/examples/temporal/) from the [HiddenMarkovModels.jl](https://github.com/gdalle/HiddenMarkovModels.jl) package.
+It should then **benefit** from all the good stuff there, in particular **multi-sequence support**, **automatic differentiation** support etc.
 
 ## Simple example
 
@@ -15,7 +22,7 @@ using Distributions
 using Random
 ```
 
-### Creating matrix
+### Creating transition matrices
 
 ```julia
 Random.seed!(2022)
@@ -39,7 +46,7 @@ hmm = PeriodicHMM(init, trans_per, dists_per)
 
 ### Creating guess matrix (initial condition for the EM algorithm)
 
-Here we add noise to the true matrix (not too far to not end up in far away local minima).
+Here we add noise to the true matrix (not too much to avoid ending in a neighboring local minima).
 
 ```julia
 ν_guess = [dist[i](2i * cos(2π * t / T) + 0.01 * randn(), i + cos(2π / T * (t - i / 2 + 1))^2 + 0.05 * randn()) for i in 1:K, t in 1:T]
@@ -58,7 +65,7 @@ hmm_guess = PeriodicHMM(init, tuple(eachslice(Q_guess; dims=3)...), tuple(eachco
 ### Sampling from the HMM
 
 The `n2t` vector of length `N` controls the correspondence between the index of the sequence `n` and `t∈[1:T]`.
-The function `n_to_t(N,T)` creates a vector of length `N` and periodicity `T` but arbitrary non-periodic `n2t` are accepted.
+The function `n_to_t(N,T)` creates a vector of length `N` and periodicity `T`, but arbitrary non-periodic `n2t` vectors are accepted.
 
 ```julia
 n2t = n_to_t(N, T)
@@ -80,6 +87,10 @@ default(fontfamily="Computer Modern", linewidth=2, label=nothing, grid=true, fra
 
 #### Transition matrix
 
+<details close>
+
+<summary>Code for the plot</summary>
+
 ```julia
 begin
     p = [plot(xlabel="t") for i in 1:K]
@@ -91,9 +102,15 @@ begin
 end
 ```
 
+</details>
+
 ![Time dependent transition matrix coefficient](img/Q_estiamated.svg)
 
 #### Emission distribution
+
+<details close>
+
+<summary>Code for the plot</summary>
 
 ```julia
 begin
@@ -108,8 +125,10 @@ begin
 end
 ```
 
+</details>
+
 ![Emission distribution parameters](img/nu_estiamated.svg)
 
 > [!WARNING]
-> As it is `fit_mle` does not enforce smoothness of hidden states with `t` i.e. because HMM are identifiable up to a relabeling nothing prevents that after fitting `ν[k=1, t=1]` and `ν[k=1, t=2]` mean the same hidden state (same for `Q` matrix).
-> To enforce smoothness and identifiability (up to a global index relabeling), one can be inspired by seasonal Hidden Markov Model, see [A. Touron (2019)](https://link.springer.com/article/10.1007/s11222-019-09854-4). This is already implemented in [SmoothPeriodicStatsModels.jl](https://github.com/dmetivie/SmoothPeriodicStatsModels.jl).but I plan to add this feature to `PeriodicHiddenMarkovModels.jl` soon.
+> As it stands, `fit_mle` does not enforce smoothness of hidden states with `t`, i.e., because HMMs are identifiable up to a relabeling, nothing prevents that after fitting, `ν[k=1, t=1]` and `ν[k=1, t=2]` mean the same hidden state (same for the `Q` matrix).
+> To enforce smoothness and identifiability (up to a global index relabeling), one can be inspired by seasonal Hidden Markov Models; see [A. Touron (2019)](https://link.springer.com/article/10.1007/s11222-019-09854-4). This is already implemented in [SmoothPeriodicStatsModels.jl](https://github.com/dmetivie/SmoothPeriodicStatsModels.jl), but I plan to add this feature to `PeriodicHiddenMarkovModels.jl` soon.
