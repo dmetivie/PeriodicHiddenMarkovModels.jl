@@ -1,7 +1,10 @@
 name = "PeriodicHiddenMarkovModels"
 uuid = "4873b48c-7fd1-4fb6-93c5-649b25bdde2e"
 authors = ["David Métivier <david.metivier@inrae.fr> and contributors"]
-version = "0.3.1"
+version = "0.3.2"
+
+[workspace]
+projects = ["test"]
 
 [deps]
 ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
@@ -12,4 +15,8 @@ StatsAPI = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
 julia = "1"
 ArgCheck = "2"
 StatsAPI = "1.6"
+# The lower bound is not cosmetic. Up to v0.5, `forward_backward!` built `ξ[t]` with
+# `transition_matrix(hmm, control_seq[t])`; from v0.6 it uses `control_seq[t + 1]`, so a
+# transition matrix is indexed by the period of the step it *arrives at*. `fit!` here groups
+# `ξ` the v0.6 way, and on v0.5 it would be off by one step — see CHANGELOG v0.3.2.
 HiddenMarkovModels = "0.6, 0.7"

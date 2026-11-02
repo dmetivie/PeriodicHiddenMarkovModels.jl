@@ -15,10 +15,17 @@ function StatsAPI.fit!(
     @views for k in eachindex(seq_ends)
         t1, t2 = HMMs.seq_limits(seq_ends, k)
         hmm.init .+= γ[:, t1]
-        n2t_k = n2t[t1:t2]
 
-        for l in 1:L
-            hmm.trans[l] .+= sum(ξ[first(parentindices(n2t_k))[findall(n2t_k .== l)]])
+        # `ξ[t]` is the marginal of the step `t -> t+1`, and `forward_backward!` builds it with
+        # `transition_matrix(hmm, control_seq[t + 1])`: a transition matrix is indexed by the
+        # period of the step it *arrives at*. So `trans[l]` collects the `ξ[t]` whose successor
+        # has period `l`, not those whose own period is `l`. The two differ by one step, and
+        # grouping on the wrong one re-estimates `A(l)` from the transitions belonging to
+        # `A(l+1)`, which is a decreasing likelihood rather than an error. It is invisible when
+        # `L == 1`, which is why the homogeneous testset never caught it.
+        # (`t2` has no successor inside the sequence, and `ξ[t2]` is zeroed by forward-backward.)
+        for t in t1:(t2 - 1)
+            hmm.trans[n2t[t + 1]] .+= ξ[t]
         end
     end
     hmm.init ./= sum(hmm.init)

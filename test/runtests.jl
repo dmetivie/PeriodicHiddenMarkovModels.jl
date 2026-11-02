@@ -108,10 +108,31 @@ end
 
     hmm_guess = PeriodicHMM(init, tuple(eachslice(Q_guess; dims=3)...), tuple(eachcol(ν_guess)...))
 
-    hmm_fit, hist = baum_welch(hmm_guess, obs_seq, n2t)
+    # 100 iterations (the default) leaves this model a long way from its optimum: it needs 1684
+    # to reach `atol = 1e-5`. Measuring a half-converged fit confuses a slow EM with a wrong one.
+    hmm_fit, hist = baum_welch(hmm_guess, obs_seq, n2t; max_iterations=2000)
+
+    # The real regression guard. This is what caught the transition/period misalignment in
+    # `fit!`: group `ξ[t]` by `n2t[t]` instead of `n2t[t+1]` and the likelihood decreases.
     @test all(diff(hist) .> 0)
+
+    # And the property that says the M-step is the right one: a maximum likelihood estimate
+    # fits the sample better than the parameters the sample was drawn from. The excess here is
+    # 29.7 nats against the p/2 = 30 that Wilks predicts for this model's 60 free parameters.
+    @test logdensityof(hmm_fit, obs_seq, n2t) > logdensityof(hmm, obs_seq, n2t)
+
+    # Parameter recovery is only a loose smoke test on this model, not a sharp one. The two
+    # states' emission means differ by at most 2.0 while their standard deviations are 1-2, so
+    # they overlap at every period and the transition probabilities are weakly identified. At
+    # convergence the worst entry is out by 0.216 (t = 4, where the fitted first row collapses
+    # to the edge of the simplex, [1.0, 3.2e-6], against a true [0.784, 0.216]). That is the
+    # model, not the fitter -- the likelihood above is already at its maximum. Separating the
+    # states (larger `2i*cos(...)` means, or smaller variances) would make a sharp test possible.
+    #
+    # Entrywise rather than `≈`, which compares `norm(A - B)`: four entries each within 0.216
+    # still give a norm of 0.41, so a matrix-level `atol` says nothing about any one probability.
     for t in 1:T
-        @test transition_matrix(hmm_fit, t) ≈ transition_matrix(hmm, t) rtol = 15e-2
+        @test maximum(abs, transition_matrix(hmm_fit, t) - transition_matrix(hmm, t)) < 25e-2
     end
 
     @test isapprox(collect.(Distributions.params.(obs_distributions(hmm_fit, 1))), collect.(Distributions.params.(obs_distributions(hmm, 1))), rtol=5e-2)
