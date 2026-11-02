@@ -8,3 +8,10 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [sources]
 PeriodicHiddenMarkovModels = {path = ".."}
+
+[compat]
+Distributions = "0.25.132"
+HiddenMarkovModels = "0.7.1"
+Random = "<0.0.1, 1"
+StableRNGs = "1.1.0"
+Test = "<0.0.1, 1"
